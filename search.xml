@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title></title>
+    <url>/2024/03/19/first/</url>
+    <content><![CDATA[<hr>
+<hr>
+<h2 id="LM-HASH"><a href="#LM-HASH" class="headerlink" title="LM HASH"></a>LM HASH</h2><h3 id="生成规则"><a href="#生成规则" class="headerlink" title="生成规则"></a>生成规则</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1.用户的密码被限制为最多14个字符。</span><br><span class="line">2.用户的密码转换为大写。</span><br><span class="line">3.密码转换为16进制字符串，不足14字节将会用0来再后面补全。</span><br><span class="line">4.密码的16进制字符串被分成两个7byte部分。每部分转换成比特流，并且长度位56bit，长度不足使用0在左边补齐长度，再分7bit为一组末尾加上0,组成新的编码（str_to_key()函数处理）</span><br><span class="line">5.上步骤得到的8byte二组，分别作为DES key为&quot;KGS!@#$%&quot;进行加密。</span><br><span class="line">6.将二组DES加密后的编码拼接，得到最终LM HASH值。</span><br></pre></td></tr></table></figure>
+
+<h3 id="python脚本"><a href="#python脚本" class="headerlink" title="python脚本"></a>python脚本</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">import hashlib</span><br><span class="line"></span><br><span class="line">def lm_hash(plaintext_password):</span><br><span class="line">    # Pad the password to 14 characters with null bytes</span><br><span class="line">    padded_password = (plaintext_password.upper() + &#x27;\x00&#x27; * 14)[:14]</span><br><span class="line"></span><br><span class="line">    # Split the password into two 7-character halves</span><br><span class="line">    password_half1 = padded_password[:7]</span><br><span class="line">    password_half2 = padded_password[7:]</span><br><span class="line"></span><br><span class="line">    # Create DES keys from the halves and hash them</span><br><span class="line">    des_key1 = hashlib.new(&#x27;md4&#x27;, password_half1.encode(&#x27;ascii&#x27;)).digest()</span><br><span class="line">    des_key2 = hashlib.new(&#x27;md4&#x27;, password_half2.encode(&#x27;ascii&#x27;)).digest()</span><br><span class="line"></span><br><span class="line">    # Concatenate the DES keys to get the LM hash</span><br><span class="line">    lm_hash = des_key1 + des_key2</span><br><span class="line"></span><br><span class="line">    return lm_hash.hex()</span><br><span class="line"></span><br><span class="line">plaintext_password = &quot;your_password&quot;</span><br><span class="line">lm_hash = lm_hash(plaintext_password)</span><br><span class="line">print(&quot;LM Hash:&quot;, lm_hash)</span><br></pre></td></tr></table></figure>
+
+<h2 id="NTLM-HASH"><a href="#NTLM-HASH" class="headerlink" title="NTLM HASH"></a>NTLM HASH</h2><h3 id="生成规则-1"><a href="#生成规则-1" class="headerlink" title="生成规则"></a>生成规则</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1.首先将密码字符串转化为ASCII字符串</span><br><span class="line">2.ASCII字符串再转换为十六进制字符串，</span><br><span class="line">3.十六进制字符串再转化为Unicode字符串，</span><br><span class="line">5.然后对Unicode字符串使用MD4消息摘要算法，这会产生一个16字节的值，即为NTLM-HASH</span><br></pre></td></tr></table></figure>
+
+<h3 id="python脚本-1"><a href="#python脚本-1" class="headerlink" title="python脚本"></a>python脚本</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">import hashlib</span><br><span class="line"></span><br><span class="line">plaintext_password = &quot;your_password&quot;</span><br><span class="line"></span><br><span class="line">ntlm_hash = hashlib.new(&#x27;md4&#x27;, plaintext_password.encode(&#x27;utf-16le&#x27;)).hexdigest()</span><br><span class="line"></span><br><span class="line">print(&quot;NTLM Hash:&quot;, ntlm_hash)</span><br></pre></td></tr></table></figure>
+
+<h2 id="HASH爆破"><a href="#HASH爆破" class="headerlink" title="HASH爆破"></a>HASH爆破</h2><h2 id="Windows访问控制模型"><a href="#Windows访问控制模型" class="headerlink" title="Windows访问控制模型"></a>Windows访问控制模型</h2><h2 id="kerberos预身份验证"><a href="#kerberos预身份验证" class="headerlink" title="kerberos预身份验证"></a>kerberos预身份验证</h2><h2 id="kerberos协议"><a href="#kerberos协议" class="headerlink" title="kerberos协议"></a>kerberos协议</h2><h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><table>
+<thead>
+<tr>
+<th>简称</th>
+<th>全拼</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DC</td>
+<td>Domain Controller</td>
+<td>域控</td>
+</tr>
+<tr>
+<td>krbtgt</td>
+<td></td>
+<td>KDC秘钥发行中心服务账户</td>
+</tr>
+<tr>
+<td>KDC</td>
+<td>Key Distribution Center</td>
+<td>秘钥分发中心，由域控担任</td>
+</tr>
+<tr>
+<td>AS</td>
+<td>Authentication Service</td>
+<td>认证服务</td>
+</tr>
+<tr>
+<td>TGS</td>
+<td>Ticket Granting Service</td>
+<td>票据授予服务</td>
+</tr>
+<tr>
+<td>TGT</td>
+<td>Ticket Granting Ticket</td>
+<td>TGT认购权证</td>
+</tr>
+<tr>
+<td>ST</td>
+<td>Service Ticket</td>
+<td>ST服务票据</td>
+</tr>
+<tr>
+<td>PAC</td>
+<td>Privilege Attribute Certificate</td>
+<td>特权属性证书</td>
+</tr>
+<tr>
+<td>SPN</td>
+<td>Service Principal Name</td>
+<td>服务主体名称</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>KDC:</p>
+<p>KDC秘钥分发中心是一种网络服务，他向活动目录域内的用户和计算机提供临时会话票据和临时会话秘钥，其服务账户为krbtgt。KDC作为活动目录域服务ADDS的一部分运行在每个域控制器上</p>
+<p><img src="/2024/03/19/first/image-20240302111410282.png" alt="image-20240302111410282"></p>
+<p><img src="/2024/03/19/first/image-20240302111501313.png" alt="image-20240302111501313"></p>
+<p>krbtgt:</p>
+<p>krbtgt账户是在创建活动目录时系统自动创建的一个账号，其作用是KDC秘钥分发中心的服务账号，其密码是随机生成的，无法正常登录主机。主要作用是生成和存储用于服务票据 (Service Tickets) 的密钥，这些票据用于在用户和服务之间进行身份验证和授权。它是域中所有用户和服务的票据颁发者</p>
+<p><img src="/2024/03/19/first/image-20240229202509823.png" alt="image-20240229202509823"></p>
+<p>AS:</p>
+<p>身份认证服务，它执行初始身份验证并为用户颁发TGT(票证授予票证)</p>
+<p>TGS：</p>
+<p>票据授权服务，它根据用户身份票据权限来颁发服务票据</p>
+<p>PAC:</p>
+<p>特权属性证书，其中包含的是各种授权信息、附加凭据信息、配置文件和策略信息等。例如用户所属的用户组，用户所具有的权限等。因为在域中不同权限的用户所能访问的资源是不同的，因此微软设计PAC来辨别用户身份和权限。在一个正常的kerberos认证流程中，KDC返回的TGT和ST都是带有PAC的，这样服务端再接收到客户端请求的时候不再需要借助KDC的帮助提供完整的授权信息来完成对用户权限的判断，而只需要根据请求中所包含的PAC信息直接与本地资源的ACL相比较做出裁决</p>
+<p>SPN:</p>
+<p>SPN（Server Principal Names）服务主体名称，是服务实例的唯一标识符（例如：HTTP、SMB、Mysql等）。</p>
+<h3 id="认证流程"><a href="#认证流程" class="headerlink" title="认证流程"></a>认证流程</h3><h4 id="基础模型"><a href="#基础模型" class="headerlink" title="基础模型"></a>基础模型</h4><p>首先kerberos协议解决的是“如何证明某个人确确实实就是他或她所声称的那个人”的问题，也就是 client请求Server，那么必须让Server对client进行有效的认证。</p>
+<p>最最简单的模型就是有一个c-s-key仅存于Client和Server，Client向Server提供c-s-key来证明他是Client</p>
+<p>Client对Server提供两组信息:</p>
+<p>1、代表Client自身Identity的信息，为了简便，它以明文的形式传递</p>
+<p>2、将Client的Identity使用c-s-key作为Public Key、并采用对称加密算法进行加密</p>
+<p>由于c-s-key仅仅被Client和Server知晓，所以被Client使用c-s-key加密过的Client Identity只能被Client和Server解密。</p>
+<p>Long-term Key&#x2F;Master Key：</p>
+<p>在Security的领域中，有的Key可能长期内保持不变，比如你在密码，可能几年都不曾改变，这样的Key、以及由此派生的Key被称为Long-term Key，它的使用原则是：被Long-term Key加密的数据不应该在网络上传输。一旦这些被Long-term Key加密的数据包被恶意的网络监听者截获，在原则上，只要有充足的时间，他是可以通过计算获得你用于加密的Long-term Key的。</p>
+<p>对于一个Account来说，密码往往仅仅限于该Account的所有者知晓，但是密码却又是证明身份的凭据，所以必须通过基于你密码的派生的信息来证明用户的真实身份，一般将你的密码进行Hash运算得到一个Hash code, 我们一般管这样的Hash Code叫做Master Key。由于Hash Algorithm是不可逆的，同时保证密码和Master Key是一一对应的，这样既保证了你密码的保密性，又保证了Master Key在证明身份上和密码的相同效力</p>
+<p>Short-term Key&#x2F;Session Key：</p>
+<p>由于这种Key只在一段时间内有效，即使被加密的数据包被黑客截获，等他把Key计算出来的时候，这个Key早就已经过期了。</p>
+<p>看到这里就能明白上面说的Client和Server共同拥有的c-s-key为一个Short-term Key，那么该如何得到这个c-s-key呢</p>
+<p>这里就可以引入KDC了，对一个Windows域来说，DC（域控）扮演着KDC的角色，KDC维护着一个存储着该Domain中所有帐户的Account Database（一般地，这个Account Database由AD来维护），也就是说，它知道属于每个Account的名称和派生于该Account Password的Master Key。</p>
+<p><img src="/2024/03/19/first/image-20240229203324842.png" alt="image-20240229203324842"></p>
+<p>Kerberos整个认证过程通过4个sub-protocol来完成，这4个sub-protocol分别为：</p>
+<p>1、Authentication Service Exchange</p>
+<p>2、Ticket Granting Service Exchange</p>
+<p>3、Client&#x2F;Server Exchange</p>
+<p>4、User2User Sub-Protocol</p>
+<p>其实一开始的框架只有前3个sub-protocol，User2User Sub-Protocol是为了有效地保障Server的安全后来增加的</p>
+<p>下图简单展示了完成这个4个Sub-protocol所进行的Message Exchange</p>
+<p><img src="/2024/03/19/first/kerberos_03_01.gif" alt="kerberos_03_01"></p>
+<h4 id="AS-Exchange-Client2AS"><a href="#AS-Exchange-Client2AS" class="headerlink" title="&lt;1&gt;AS Exchange(Client2AS)"></a>&lt;1&gt;AS Exchange(Client2AS)</h4><p>KRB_AS_REQ：</p>
+<p>Client向AS发送Authentication Service Request，并且Client使用自己的Master Key对KRB_AS_REQ的主体部分进行加密。KRB_AS_REQ的大体包含以下的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Pre-authentication data</span><br><span class="line">//一般地，它的内容是一个被Client的Master key加密过的Timestamp。</span><br><span class="line">Client name &amp; realm</span><br><span class="line">//简单地说就是Domain name\Client</span><br><span class="line">Server Name</span><br><span class="line">//这里的Server Name并不是Client真正要访问的Server的名称，TGT是和Server无关的（Client只能使用Ticket，而不是TGT去访问Server，这里的Server Name实际上是KDC的TGS的Server Name。</span><br></pre></td></tr></table></figure>
+
+<p>KRB_AS_REP：</p>
+<p>AS只需从Account Database中提取Client对应的Master Key对Pre-authentication data进行解密，如果是一个合法的Timestamp，则可以证明发送放提供的是正确无误的密码，验证通过之后，AS将一份KRB_AS_REP发送给Client。KRB_AS_REP大体包含：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SKDC-Client(被KDC用Client的Master Key加密)</span><br><span class="line">//KDC与Client之间的Session Key</span><br><span class="line">TGT(被KDC用自己的Master Key加密)</span><br><span class="line">//TGT包含&lt;SKDC-Client&gt; &lt;Client name &amp; realm&gt; &lt;End time:TGT的到期时间&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2024/03/19/first/kerberos_01_07.gif" alt="kerberos_01_07"></p>
+<p>Client使用Master解密得到SKDC-Client，携带TGT进入下一阶段</p>
+<h4 id="AS-Exchange-Server2AS"><a href="#AS-Exchange-Server2AS" class="headerlink" title="&lt;2&gt;AS Exchange(Server2AS)"></a>&lt;2&gt;AS Exchange(Server2AS)</h4><p>重复和第一步相似的操作，只不过这次是Server与AS之间进行，结果是获得了<SKDC-Server>和&lt;Server的TGT&gt;，其中TGT包含了SKDC-Server，被KDC master key 加密。</p>
+<p>注意这一步可能发生在第一步之前，然后Server将得到的TGT缓存。当然也可能是在Client向Server请求TGT时发生</p>
+<h4 id="get-TGT-from-Server"><a href="#get-TGT-from-Server" class="headerlink" title="&lt;3&gt;get TGT from Server"></a>&lt;3&gt;get TGT from Server</h4><p>这一步的主要任务是Client向获得封装了SKDC-Server的属于Server的TGT。如果该TGT存在于Server的缓存中，则Server会直接将其返回给Client。否则通过Server将通过AS Exchange从KDC获取，也就是我这里的第&lt;2&gt;步</p>
+<h4 id="TGS-Exchange"><a href="#TGS-Exchange" class="headerlink" title="&lt;4&gt;TGS Exchange"></a>&lt;4&gt;TGS Exchange</h4><p>KRB_TGS_REQ：</p>
+<p>Client 向KDC中的TGS发送KRB_TGS_REQ，大体包含以下内容 ：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">TGT(共有2个):</span><br><span class="line">//Client通过AS Exchange 得到的被KDC master key加密的TGT</span><br><span class="line">//Client从Server获得的TGT</span><br><span class="line">Authenticator：</span><br><span class="line">//用来证明Client为TGT的拥有者，故其被SKDC-Client加密</span><br><span class="line">Client name &amp; realm：</span><br><span class="line">Server name &amp; realm：</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>TGS先得通过自己的Master Key对Client提供的TGT进行解密，得到SKDC-Client，再用这个SKDC-Client解密Authenticator进行验证，如果验证通过，再用 KDC Master key解密Server TGT得到SKDC-Server ,然后TGS向Client发送KRB_TGS_REP</p>
+<p>KRB_TGS_REP：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">SServer-Client：</span><br><span class="line">//Client和Server之间的Session Key，被SKDC-Client加密</span><br><span class="line">ST:</span><br><span class="line">//被SKDC-Server加密，包含 &lt;SServer-Client&gt; &lt;Client name &amp; realm&gt; &lt;End time&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Client收到KRB_TGS_REP，使用SKDC-Client解密出SServer-Client，那么这个时候就回到了我们最初的那个简单模型，Client可以和Server进行交互，不再需要KDC这个第三方了</p>
+<h4 id="CS-Exchange"><a href="#CS-Exchange" class="headerlink" title="&lt;5&gt;CS Exchange"></a>&lt;5&gt;CS Exchange</h4><p>KRB_AP_REQ:</p>
+<p>Client创建Authenticator(用于证明自己就是Ticket的真正所有者)并用SServer-Client加密，最后将这个被加密过的Authenticator和ST作为KRB_AP_REQ发送给Server，RB_AP_REQ还包含一个Flag用于表示Client是否需要进行双向验证</p>
+<p>Server通过SKDC-Server解密ST获得SServer-Client，通过SServer-Client解密Authenticator实现对Client的验证，验证成功，让Client访问需要访问的资源，否则直接拒绝对方的请求。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2024/03/19/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+</search>
