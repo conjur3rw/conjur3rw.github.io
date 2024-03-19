@@ -20,7 +20,7 @@
 <meta property="og:image" content="http://example.com/2024/03/19/first/kerberos_03_01.gif">
 <meta property="og:image" content="http://example.com/2024/03/19/first/kerberos_01_07.gif">
 <meta property="article:published_time" content="2024-03-19T11:20:27.908Z">
-<meta property="article:modified_time" content="2024-03-19T11:22:44.118Z">
+<meta property="article:modified_time" content="2024-03-19T11:44:34.535Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/2024/03/19/first/image-20240302111410282.png">
@@ -205,11 +205,11 @@
 <h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>KDC:</p>
 <p>KDC秘钥分发中心是一种网络服务，他向活动目录域内的用户和计算机提供临时会话票据和临时会话秘钥，其服务账户为krbtgt。KDC作为活动目录域服务ADDS的一部分运行在每个域控制器上</p>
 <p><img src="/2024/03/19/first/image-20240302111410282.png" alt="image-20240302111410282"></p>
-<img src="image-20240302111501313.png" alt="image-20240302111501313" style="zoom: 50%;" />
+<img src="./image-20240302111501313.png" alt="image-20240302111501313" style="zoom: 50%;" />
 
 <p>krbtgt:</p>
 <p>krbtgt账户是在创建活动目录时系统自动创建的一个账号，其作用是KDC秘钥分发中心的服务账号，其密码是随机生成的，无法正常登录主机。主要作用是生成和存储用于服务票据 (Service Tickets) 的密钥，这些票据用于在用户和服务之间进行身份验证和授权。它是域中所有用户和服务的票据颁发者</p>
-<img src="image-20240229202509823.png" alt="image-20240229202509823" style="zoom:80%;" />
+<img src="./image-20240229202509823.png" alt="image-20240229202509823" style="zoom:80%;" />
 
 <p>AS:</p>
 <p>身份认证服务，它执行初始身份验证并为用户颁发TGT(票证授予票证)</p>
@@ -240,7 +240,7 @@
 <p>4、User2User Sub-Protocol</p>
 <p>其实一开始的框架只有前3个sub-protocol，User2User Sub-Protocol是为了有效地保障Server的安全后来增加的</p>
 <p>下图简单展示了完成这个4个Sub-protocol所进行的Message Exchange</p>
-<img src="kerberos_03_01.gif" alt="img" style="zoom:150%;" />
+<img src="./kerberos_03_01.gif" alt="img" style="zoom:150%;" />
 
 
 
@@ -252,7 +252,7 @@
 <p>AS只需从Account Database中提取Client对应的Master Key对Pre-authentication data进行解密，如果是一个合法的Timestamp，则可以证明发送放提供的是正确无误的密码，验证通过之后，AS将一份KRB_AS_REP发送给Client。KRB_AS_REP大体包含：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SKDC-Client(被KDC用Client的Master Key加密)</span><br><span class="line">//KDC与Client之间的Session Key</span><br><span class="line">TGT(被KDC用自己的Master Key加密)</span><br><span class="line">//TGT包含&lt;SKDC-Client&gt; &lt;Client name &amp; realm&gt; &lt;End time:TGT的到期时间&gt;</span><br></pre></td></tr></table></figure>
 
-<img src="kerberos_01_07.gif" alt="kerberos_01_07" style="zoom:150%;" />
+<img src="./kerberos_01_07.gif" alt="kerberos_01_07" style="zoom:150%;" />
 
 <p>Client使用Master解密得到SKDC-Client，携带TGT进入下一阶段</p>
 <h4 id="AS-Exchange-Server2AS"><a href="#AS-Exchange-Server2AS" class="headerlink" title="&lt;2&gt;AS Exchange(Server2AS)"></a>&lt;2&gt;AS Exchange(Server2AS)</h4><p>重复和第一步相似的操作，只不过这次是Server与AS之间进行，结果是获得了<SKDC-Server>和&lt;Server的TGT&gt;，其中TGT包含了SKDC-Server，被KDC master key 加密。</p>
