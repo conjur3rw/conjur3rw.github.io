@@ -69,9 +69,9 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-王子昊" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+    <article id="post-first" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A/" class="article-date">
+    <a href="/2024/03/19/first/" class="article-date">
   <time class="dt-published" datetime="2024-03-19T08:51:50.901Z" itemprop="datePublished">2024-03-19</time>
 </a>
     
@@ -195,12 +195,12 @@
 </tbody></table>
 <h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>KDC:</p>
 <p>KDC秘钥分发中心是一种网络服务，他向活动目录域内的用户和计算机提供临时会话票据和临时会话秘钥，其服务账户为krbtgt。KDC作为活动目录域服务ADDS的一部分运行在每个域控制器上</p>
-<p><img src="/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240302111410282.png" alt="image-20240302111410282"></p>
-<img src="王子昊作业1/image-20240302111501313.png" alt="image-20240302111501313" style="zoom: 50%;" />
+<p><img src="/first/image-20240302111410282.png" alt="image-20240302111410282"></p>
+<img src="first/image-20240302111501313.png" alt="image-20240302111501313" style="zoom: 50%;" />
 
 <p>krbtgt:</p>
 <p>krbtgt账户是在创建活动目录时系统自动创建的一个账号，其作用是KDC秘钥分发中心的服务账号，其密码是随机生成的，无法正常登录主机。主要作用是生成和存储用于服务票据 (Service Tickets) 的密钥，这些票据用于在用户和服务之间进行身份验证和授权。它是域中所有用户和服务的票据颁发者</p>
-<img src="王子昊作业1/image-20240229202509823.png" alt="image-20240229202509823" style="zoom:80%;" />
+<img src="first/image-20240229202509823.png" alt="image-20240229202509823" style="zoom:80%;" />
 
 <p>AS:</p>
 <p>身份认证服务，它执行初始身份验证并为用户颁发TGT(票证授予票证)</p>
@@ -223,7 +223,7 @@
 <p>由于这种Key只在一段时间内有效，即使被加密的数据包被黑客截获，等他把Key计算出来的时候，这个Key早就已经过期了。</p>
 <p>看到这里就能明白上面说的Client和Server共同拥有的c-s-key为一个Short-term Key，那么该如何得到这个c-s-key呢</p>
 <p>这里就可以引入KDC了，对一个Windows域来说，DC（域控）扮演着KDC的角色，KDC维护着一个存储着该Domain中所有帐户的Account Database（一般地，这个Account Database由AD来维护），也就是说，它知道属于每个Account的名称和派生于该Account Password的Master Key。</p>
-<p><img src="/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240229203324842.png" alt="image-20240229203324842"></p>
+<p><img src="/first/image-20240229203324842.png" alt="image-20240229203324842"></p>
 <p>Kerberos整个认证过程通过4个sub-protocol来完成，这4个sub-protocol分别为：</p>
 <p>1、Authentication Service Exchange</p>
 <p>2、Ticket Granting Service Exchange</p>
@@ -231,7 +231,7 @@
 <p>4、User2User Sub-Protocol</p>
 <p>其实一开始的框架只有前3个sub-protocol，User2User Sub-Protocol是为了有效地保障Server的安全后来增加的</p>
 <p>下图简单展示了完成这个4个Sub-protocol所进行的Message Exchange</p>
-<img src="王子昊作业1/kerberos_03_01.gif" alt="img" style="zoom:150%;" />
+<img src="first/kerberos_03_01.gif" alt="img" style="zoom:150%;" />
 
 
 
@@ -243,7 +243,7 @@
 <p>AS只需从Account Database中提取Client对应的Master Key对Pre-authentication data进行解密，如果是一个合法的Timestamp，则可以证明发送放提供的是正确无误的密码，验证通过之后，AS将一份KRB_AS_REP发送给Client。KRB_AS_REP大体包含：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SKDC-Client(被KDC用Client的Master Key加密)</span><br><span class="line">//KDC与Client之间的Session Key</span><br><span class="line">TGT(被KDC用自己的Master Key加密)</span><br><span class="line">//TGT包含&lt;SKDC-Client&gt; &lt;Client name &amp; realm&gt; &lt;End time:TGT的到期时间&gt;</span><br></pre></td></tr></table></figure>
 
-<img src="王子昊作业1/kerberos_01_07.gif" alt="kerberos_01_07" style="zoom:150%;" />
+<img src="first/kerberos_01_07.gif" alt="kerberos_01_07" style="zoom:150%;" />
 
 <p>Client使用Master解密得到SKDC-Client，携带TGT进入下一阶段</p>
 <h4 id="AS-Exchange-Server2AS"><a href="#AS-Exchange-Server2AS" class="headerlink" title="&lt;2&gt;AS Exchange(Server2AS)"></a>&lt;2&gt;AS Exchange(Server2AS)</h4><p>重复和第一步相似的操作，只不过这次是Server与AS之间进行，结果是获得了<SKDC-Server>和&lt;Server的TGT&gt;，其中TGT包含了SKDC-Server，被KDC master key 加密。</p>
@@ -269,7 +269,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A/" data-id="clty55ca90000kgvh6lpxbefk" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="http://example.com/2024/03/19/first/" data-id="clty5gckz0000cgvh6k723cp4" data-title="" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -363,7 +363,7 @@
       <ul>
         
           <li>
-            <a href="/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A/">(no title)</a>
+            <a href="/2024/03/19/first/">(no title)</a>
           </li>
         
           <li>
