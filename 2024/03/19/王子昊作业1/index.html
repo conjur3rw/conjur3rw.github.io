@@ -14,13 +14,13 @@
 <meta property="og:description" content="LM HASH生成规则1234561.用户的密码被限制为最多14个字符。2.用户的密码转换为大写。3.密码转换为16进制字符串，不足14字节将会用0来再后面补全。4.密码的16进制字符串被分成两个7byte部分。每部分转换成比特流，并且长度位56bit，长度不足使用0在左边补齐长度，再分7bit为一组末尾加上0,组成新的编码（str_to_key()函数处理）5.上步骤得到的8byte二组，分别作">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240302111410282.png">
-<meta property="og:image" content="http://example.com/2024/03/19/image/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240302111501313.png">
+<meta property="og:image" content="http://example.com/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240302111501313.png">
 <meta property="og:image" content="http://example.com/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240229202509823.png">
 <meta property="og:image" content="http://example.com/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240229203324842.png">
 <meta property="og:image" content="http://example.com/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/kerberos_03_01.gif">
 <meta property="og:image" content="http://example.com/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/kerberos_01_07.gif">
-<meta property="article:published_time" content="2024-03-19T09:46:11.357Z">
-<meta property="article:modified_time" content="2024-03-19T09:47:06.931Z">
+<meta property="article:published_time" content="2024-03-19T09:52:22.275Z">
+<meta property="article:modified_time" content="2024-03-05T14:43:00.480Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240302111410282.png">
@@ -81,7 +81,7 @@
         <section id="main"><article id="post-王子昊作业1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2024/03/19/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/" class="article-date">
-  <time class="dt-published" datetime="2024-03-19T09:46:11.357Z" itemprop="datePublished">2024-03-19</time>
+  <time class="dt-published" datetime="2024-03-19T09:52:22.275Z" itemprop="datePublished">2024-03-19</time>
 </a>
     
   </div>
@@ -204,8 +204,8 @@
 </tbody></table>
 <h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><p>KDC:</p>
 <p>KDC秘钥分发中心是一种网络服务，他向活动目录域内的用户和计算机提供临时会话票据和临时会话秘钥，其服务账户为krbtgt。KDC作为活动目录域服务ADDS的一部分运行在每个域控制器上</p>
-<p><img src="/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240302111410282.png" alt="../image/.image-20240302111410282"></p>
-<img src="../image/王子昊作业1/image-20240302111501313.png" alt="image-20240302111501313" style="zoom: 50%;" />
+<p><img src="/%E7%8E%8B%E5%AD%90%E6%98%8A%E4%BD%9C%E4%B8%9A1/image-20240302111410282.png" alt="image-20240302111410282"></p>
+<img src="王子昊作业1/image-20240302111501313.png" alt="image-20240302111501313" style="zoom: 50%;" />
 
 <p>krbtgt:</p>
 <p>krbtgt账户是在创建活动目录时系统自动创建的一个账号，其作用是KDC秘钥分发中心的服务账号，其密码是随机生成的，无法正常登录主机。主要作用是生成和存储用于服务票据 (Service Tickets) 的密钥，这些票据用于在用户和服务之间进行身份验证和授权。它是域中所有用户和服务的票据颁发者</p>
